@@ -32,6 +32,14 @@ class Tests {
 
     @Test
     @Tag("Easy")
+    fun queenThreatensWithAbs() {
+        assertTrue(queenThreatensWithAbs(3, 6, 7, 6))
+        assertTrue(queenThreatensWithAbs(8, 1, 1, 8))
+        assertFalse(queenThreatensWithAbs(7, 6, 5, 7))
+    }
+
+    @Test
+    @Tag("Easy")
     fun daysInMonth() {
         assertEquals(31, daysInMonth(1, 1990))
         assertEquals(28, daysInMonth(2, 1990))

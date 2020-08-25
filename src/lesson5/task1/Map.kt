@@ -2,6 +2,9 @@
 
 package lesson5.task1
 
+import ru.spbstu.kotlin.typeclass.kind
+import kotlin.reflect.typeOf
+
 /**
  * Пример
  *
@@ -91,7 +94,11 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *   buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
-fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
+fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> =
+    grades.toList().groupBy(
+        { it.second },
+        { it.first }
+    )
 
 /**
  * Простая
@@ -103,7 +110,14 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
+    a.forEach { (k, v) ->
+        if (b.containsKey(k) && b[k] == v) {
+            return true
+        }
+    }
+    return false
+}
 
 /**
  * Простая
@@ -119,7 +133,8 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *   subtractOf(a = mutableMapOf("a" to "z"), mapOf("a" to "z"))
  *     -> a changes to mutableMapOf() aka becomes empty
  */
-fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit = TODO()
+fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit =
+    b.forEach { (t, u) -> a.remove(t, u) }
 
 /**
  * Простая
@@ -128,7 +143,8 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit = TO
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
+    a.intersect(b).toList()
 
 /**
  * Средняя
@@ -147,7 +163,20 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
+    val resultMap = mutableMapOf<String, String>()
+    resultMap += mapA
+    for ((k, v) in mapB) {
+        if (resultMap.containsKey(k)) {
+            if (resultMap[k] != mapB[k]) {
+                resultMap[k] = resultMap[k].toString() + ", " + mapB[k].toString()
+            }
+        } else {
+            resultMap[k] = mapB[k].toString()
+        }
+    }
+    return resultMap
+}
 
 /**
  * Средняя
@@ -159,7 +188,18 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> = TODO()
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val tempMap = stockPrices.groupBy { it.first }
+    val resultMap = mutableMapOf<String, Double>()
+    for ((k, v) in tempMap) {
+        var total = 0.0
+        for ((a, b) in v) {
+            total += b
+        }
+        resultMap[k] = total / v.count()
+    }
+    return resultMap.toMap()
+}
 
 /**
  * Средняя
@@ -176,7 +216,14 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? = TODO()
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
+    val tempMap = stuff.filter { (_, data) -> data.first == kind }
+    println(tempMap)
+    if (tempMap.isNotEmpty()) {
+        return tempMap.minBy { it.value.second }?.key
+    }
+    return null
+}
 
 /**
  * Средняя

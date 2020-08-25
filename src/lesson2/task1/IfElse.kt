@@ -63,7 +63,14 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    if (age % 100 in 10..14 || age % 10 in 5..9) {
+        return "$age лет"
+    } else if (age % 10 in 2..4) {
+        return "$age года"
+    }
+    return "$age год"
+}
 
 /**
  * Простая
@@ -76,7 +83,16 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    val halfPath = (t1 * v1 + t2 * v2 + t3 * v3) / 2.0
+    if (halfPath <= t1 * v1) {
+        return halfPath / v1
+    }
+    if (halfPath <= t1 * v1 + t2 * v2) {
+        return t1 + (halfPath - t1 * v1) / v2
+    }
+    return t1 + t2 + (halfPath - t1 * v1 - t2 * v2) / v3
+}
 
 /**
  * Простая
@@ -91,7 +107,15 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int {
+    // сначала проверяем угрозу от обеих ладей
+    if ((kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2)) return 3
+    // проверяем угрозу от каждой ладьи в отдельности
+    if (kingX == rookX1 || kingY == rookY1) return 1
+    if (kingX == rookX2 || kingY == rookY2) return 2
+    // если все проверки на угрозу отрицательны
+    return 0
+}
 
 /**
  * Простая
@@ -107,7 +131,24 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int {
+    // если разница X и Y координат короля и слона совпадают, то король под угрозой слона
+    // если одна из координат короля и ладьи совпадают, то король под угрозой ладьи
+    var kingBishopX = kingX - bishopX
+    var kingBishopY = kingY - bishopY
+    if (kingX < bishopX) {
+        kingBishopX *= -1
+    }
+    if (kingY < bishopY) {
+        kingBishopY *= -1
+    }
+    if ((kingBishopX == kingBishopY) && ((kingX == rookX) || (kingY == rookY))) {
+        return 3
+    }
+    if (kingBishopX == kingBishopY) return 2
+    if ((kingX == rookX) || (kingY == rookY)) return 1
+    return 0
+}
 
 /**
  * Простая
@@ -117,7 +158,26 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    // определяем наибольшую сторону
+    var max = c
+    var min1 = a
+    var min2 = b
+
+    if ((a > b) and (a > c)) {
+        max = a; min1 = b; min2 = c
+    } else if ((b > a) and (b > c)) {
+        max = b; min1 = a; min2 = c
+    }
+
+    // определяем вид треугольника по теореме Пифагора
+    if (max < min1 + min2) { // условие существования треугольника
+        if (max * max < min1 * min1 + min2 * min2) return 0 // остроугольный
+        if (max * max == min1 * min1 + min2 * min2) return 1 // прямоугольный
+        if (max * max > min1 * min1 + min2 * min2) return 2 // тупоугольный
+    }
+    return -1 // такого треугольника не существует
+}
 
 /**
  * Средняя
@@ -127,4 +187,26 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    // координаты внутри отрезков упорядочены по условию
+    // упорядочим отрезки
+    var x1 = a
+    var x2 = b
+    var x3 = c
+    var x4 = d
+    if (c < a) {
+        x1 = c
+        x2 = d
+        x3 = a
+        x4 = b
+    }
+    // считаем длину пересечения
+    if (x2 - x3 >= 0) { // пересечение есть
+        if (x2 - x4 >= 0) {
+            return x4 - x3 // если второй отрезок принадлежит первому отрезку
+        } else {
+            return x2 - x3 // если пересечение частичное
+        }
+    }
+    return -1 // нет пересечения
+}
