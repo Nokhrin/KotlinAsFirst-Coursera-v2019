@@ -166,7 +166,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val resultMap = mutableMapOf<String, String>()
     resultMap += mapA
-    for ((k, v) in mapB) {
+    for ((k, _) in mapB) {
         if (resultMap.containsKey(k)) {
             if (resultMap[k] != mapB[k]) {
                 resultMap[k] = resultMap[k].toString() + ", " + mapB[k].toString()
@@ -193,7 +193,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
     val resultMap = mutableMapOf<String, Double>()
     for ((k, v) in tempMap) {
         var total = 0.0
-        for ((a, b) in v) {
+        for ((_, b) in v) {
             total += b
         }
         resultMap[k] = total / v.count()
@@ -234,7 +234,13 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
+fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    // приводим к нижнему регистру, удаляем повторы букв
+    val wordList = word.map { it.toLowerCase() }.distinct()
+    // если буква из слова не найдена, указанное слово составить нельзя
+    wordList.forEach { char -> if (chars.indexOf(char) == -1) return false }
+    return true
+}
 
 /**
  * Средняя
@@ -248,7 +254,9 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+fun extractRepeats(list: List<String>): Map<String, Int> =
+    // создаем асс. массив элемент-частота появления, фильтруем по значению частоты
+    list.groupingBy { it }.eachCount().filter { it.value > 1 }
 
 /**
  * Средняя
@@ -259,8 +267,21 @@ fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>): Boolean {
+    // слова представляем как списки букв, сортируем полученные списки по возрастанию
+    val controlList = mutableListOf<String>()
+    words.mapTo(controlList, { it.toMutableList().sorted().toString() })
+    // группируем списки, считаем их количество
+    // если хотя бы один список встречается более одно раза, значит анаграммы содержатся в заданном списке
+    if (controlList.groupingBy { it }.eachCount().filter { it.value > 1 }.isNotEmpty()) {
+        return true
+    }
+    return false
+}
 
+fun main() {
+    println(hasAnagrams(listOf("торт", "свет", "рот")))
+}
 /**
  * Сложная
  *

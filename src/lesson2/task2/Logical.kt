@@ -38,17 +38,15 @@ fun isNumberHappy(number: Int): Boolean {
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
     if ((x1 <= x2) || (y1 <= y2)) return true
-    var deltaX = 0
-    var deltaY = 0
-    if (x2 - x1 < 0) {
-        deltaX = x1 - x2
+    val deltaX = if (x2 - x1 < 0) {
+        x1 - x2
     } else {
-        deltaX = x2 - x1
+        x2 - x1
     }
-    if (y2 - y1 < 0) {
-        deltaY = y1 - y2
+    val deltaY = if (y2 - y1 < 0) {
+        y1 - y2
     } else {
-        deltaY = y2 - y1
+        y2 - y1
     }
     if (deltaX <= deltaY) return true
     return false
@@ -74,15 +72,15 @@ fun queenThreatensWithAbs(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int {
     if (month <= 2) { // если февраль, то определяем високосный ли год
-        if ((year % 4 <= 0 && year % 100 != 0) || (year % 100 <= 0 && year % 400 <= 0)) {
-            return 29
+        return if ((year % 4 <= 0 && year % 100 != 0) || (year % 100 <= 0 && year % 400 <= 0)) {
+            29
         } else {
-            return 28
+            28
         }
     }
-    when (month) {
-        1, 3, 5, 7, 8, 10, 12 -> return 31
-        else -> return 30
+    return when (month) {
+        1, 3, 5, 7, 8, 10, 12 -> 31
+        else -> 30
     }
 }
 
@@ -99,7 +97,6 @@ fun circleInside(
     // находим расстояние между центрами окружностей + радиус меньшей окружности
     // если эта сумма меньше либо равна радиусу большей окружности, то малая окружность входит в большу
 ): Boolean = sqrt(sqr(x2 - x1) + sqr(y2 - y1)) + r1 <= r2
-
 
 /**
  * Средняя
