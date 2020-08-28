@@ -279,9 +279,6 @@ fun hasAnagrams(words: List<String>): Boolean {
     return false
 }
 
-fun main() {
-    println(hasAnagrams(listOf("торт", "свет", "рот")))
-}
 /**
  * Сложная
  *
@@ -306,7 +303,47 @@ fun main() {
  *          "Mikhail" to setOf("Sveta", "Marat")
  *        )
  */
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val resultMap = mutableMapOf<String, MutableSet<String>>()
+    for ((k, v) in friends) {
+//        println("$k has $v")
+        if (!resultMap.containsKey(k)) {
+            resultMap[k] = v.toMutableSet()
+        }
+        // добавление друзей как ключей финального массива
+        for (name in v) { // добавляем имя как ключ в финальный массив, если его там еще нет
+            if (!resultMap.containsKey(name)) {
+                resultMap[name] = mutableSetOf()
+            }
+//            println("$k - $v - $name")
+//            println(resultMap)
+            // есть ли это имя в заданном списке
+            // если нет, пропусть добавление его друзей, оставить множество пустым
+            if (friends.containsKey(name)) {
+                for (friend in friends.getValue(name)) { // добавляем друзей друга во множество
+                    //                println("$name has $friend")
+                    resultMap[name]?.add(friend)
+                }
+            }
+        }
+    }
+
+    for ((key, value) in resultMap) {
+//        println("${value}")
+        for (person in value) {
+//            println(friends[person])
+            friends[person]?.forEach {
+                if (it != key) {
+                    value.add(it)
+                }
+            }
+        }
+        value.toSet()
+    }
+    resultMap.toMap()
+    println(resultMap)
+    return resultMap
+}
 
 /**
  * Сложная
@@ -325,8 +362,25 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    if (list.isNotEmpty()) { // список не пустой
+        // forEach - нерационально, потому что проверять последнее число в этой задаче - избыточно
+        for (item in list[0]..list[list.size - 1]) {
+            // от (позиции числа + 1) - чтобы не складывать с самим собой
+            for (index in list.indexOf(item) + 1 until list.size) {
+                // возвращаем числа, сумма которых первой дала искомый результат
+                if (item + list[index] == number) {
+                    return Pair(list.indexOf(item), index)
+                }
+            }
+        }
+    }
+    return Pair(-1, -1)
+}
 
+fun main() {
+    println(findSumOfTwo(listOf(1, 2, 3), 4))
+}
 /**
  * Очень сложная
  *
