@@ -3,6 +3,8 @@
 package lesson5.task1
 
 import ru.spbstu.kotlin.typeclass.kind
+import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.reflect.typeOf
 
 /**
@@ -378,9 +380,6 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     return Pair(-1, -1)
 }
 
-fun main() {
-    println(findSumOfTwo(listOf(1, 2, 3), 4))
-}
 /**
  * Очень сложная
  *
@@ -402,4 +401,102 @@ fun main() {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    // создадим списки стоимости и массы
+    // добавим нулевой индекс, добавим туда 0 для последуюзего удобства чтения программы (чтобы не путаться в индексах)
+    val weightsList = mutableListOf<Int>()
+    weightsList.add(0)
+    val pricesList = mutableListOf<Int>()
+    pricesList.add(0)
+    treasures.forEach {
+        weightsList.add(it.value.first)
+        pricesList.add(it.value.second)
+    }
+    // проверка списков
+//    println("веса: $weightsList")
+//    println("цены: $pricesList")
+
+    // создаем таблицу мемоизации для хранения комбинаций предметов от нулевого до i-го
+    // таблица - двумерный массив
+    var memtable = arrayOf<Array<Int>>()
+    // инициируем таблицу нулями
+    // нули в первой строке и первом столбце - это базовые случаи, когда не взят ни один предмет или масса равна нулю
+    // количество строк = количеству предложенных предметов
+    for (i in 1..treasures.count()) {
+        // количество столбцов = возможным массам от 1 до допустимой с шагом 1
+        var row = arrayOf<Int>()
+        for (w in 1..capacity) {
+            row += 0
+        }
+        memtable += row
+    }
+    // проверка нулевого массива
+//    for (row in memtable) {
+//        for (value in row) {
+//            print("$value ")
+//        }
+//        println()
+//    }
+
+    // заполняем массив
+    for (i in 0..treasures.count() - 1) {
+        for (w in 0..capacity - 1) {
+            // если ничего не взяли
+            if (i == 0 || w == 0) {
+                memtable[i][w] = 0
+            } else if (weightsList[i] <= w) { // если масса текущего предмета укладывается в текущую вместимость
+                // добавление в списки цен и весов 0 в нулевой индекс позволяет обращаться к этим спискам по i
+                memtable[i][w] = // если рассчитанная новая цена меньше предыдущей, она затирается предыдущей
+                    max(
+                        pricesList[i] + memtable[i - 1][w - weightsList[i]],
+                        memtable[i - 1][w]
+                    )
+            } else {
+                // если масса не укладывается, копируем предыдущий элемент
+                memtable[i][w] = memtable[i][w - 1]
+            }
+        }
+    }
+    // проверка массива
+//    for (row in memtable) {
+//        for (value in row) {
+//            print("$value\t")
+//        }
+//        println()
+//    }
+    // получение названий предметов
+    // идем по списку предметов в обратном порядке, вычитаем массу из вместимости, запоминаем порядковый номер
+    val resultList = mutableListOf<Int>()
+    var weightLeft = capacity - 1
+    for (i in treasures.count() - 1 downTo 1) {
+        // если в предыдущей строке в этом же столбце масса такая же, значит, объект не брали, переходим к следующему индексу
+        if (memtable[i][weightLeft] != memtable[i - 1][weightLeft]) {
+//            println(memtable[i][weightLeft])
+            weightLeft -= weightsList[i]
+            resultList.add(i - 1)
+        }
+    }
+    val result = mutableSetOf<String>()
+    resultList.forEach { result.add(treasures.toList().elementAt(it).toList()[0].toString()) }
+    // трансформируем список индексов в множество названий или в пустое множество
+    return if (resultList.isEmpty()) {
+        emptySet()
+    } else {
+        result
+    }
+}
+
+fun main() {
+    println(
+        bagPacking(
+            mapOf(
+                "Греча" to (3 to 20),
+                "Чипсы" to (1 to 30),
+                "Кубок" to (2 to 10),
+                "Слиток" to (2 to 20),
+                "Мороженка" to (1 to 10)
+            ),
+            5
+        )
+    )
+}
