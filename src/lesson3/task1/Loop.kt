@@ -79,12 +79,18 @@ fun digitNumber(n: Int): Int = // рекурсия
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = // рекурсия
-    when {
-        n == 1 -> 1
-        n == 2 -> 1
-        else -> fib(n - 1) + fib(n - 2)
+fun fib(n: Int): Int { // цикл
+    var num = 1
+    var prevNum = 1
+    if (n >= 3) {
+        for (i in 3..n) {
+            val tmp = num
+            num += prevNum
+            prevNum = tmp
+        }
     }
+    return num
+}
 
 /**
  * Простая
@@ -98,13 +104,12 @@ fun lcm(m: Int, n: Int): Int { // цикл
     // определим наибольшее и наименьшее из чисел
     var max = m
     var min = n
-    var tmp = 0
     if (m < n) {
         min = m
         max = n
     }
     while (max % min != 0) { // НОД = min при завершении цикла
-        tmp = min
+        val tmp = min
         min = max % min
         max = tmp
     }
@@ -130,6 +135,28 @@ fun minDivisor(n: Int): Int { // цикл
 /**
  * Простая
  *
+ * Определить, являются ли два заданных числа m и n взаимно простыми.
+ * Взаимно простые числа не имеют общих делителей, кроме 1.
+ * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
+ */
+fun isCoPrime(m: Int, n: Int): Boolean {
+    // определим минимальное из заданных чисел
+    var min = m
+    if (m > n) {
+        min = n
+    }
+    // если числа делятся на 2, то они не взаимнопростые. Исключим 2 из перебора.
+    // для сравнения написал в Loop_optional функцию без иключения 2. С исключением получилось медленнее :)
+    if (m % 2 == 0 && n % 2 == 0) return false
+    for (i in 3..min step 2) {
+        if (m % i == 0 && n % i == 0) return false
+    }
+    return true
+}
+
+/**
+ * Простая
+ *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int { // цикл
@@ -146,39 +173,14 @@ fun maxDivisor(n: Int): Int { // цикл
 /**
  * Простая
  *
- * Определить, являются ли два заданных числа m и n взаимно простыми.
- * Взаимно простые числа не имеют общих делителей, кроме 1.
- * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
- */
-fun isCoPrime(m: Int, n: Int): Boolean {
-    var result = true
-    var min = m
-    var max = n
-    if (m > n) {
-        max = m
-        min = n
-    }
-    for (i in 2..min) {
-        if (m % i == 0 && n % i == 0) {
-            result = false
-            break
-        }
-    }
-    return result
-}
-
-/**
- * Простая
- *
  * Для заданных чисел m и n, m <= n, определить, имеется ли хотя бы один точный квадрат между m и n,
  * то есть, существует ли такое целое k, что m <= k*k <= n.
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
     var result = false
-    var root = 0.0
     for (i in m..n) {
-        root = sqrt(i.toDouble())
+        val root = sqrt(i.toDouble())
         if (i == (round(root).toInt()) * (round(root).toInt())) result = true
     }
     return result
@@ -267,14 +269,13 @@ fun revert(n: Int): Int {
     var number = n
     var digitsCount = 0
     var result = 0
-    var tmpNumber = 0
     while (number / 10 >= 1) { // считаем количество цифр в заданном числе - 1
         digitsCount += 1
         number /= 10
     }
     number = n
     while (number / 10 > 0) { // находим слагаемые для нового числа
-        tmpNumber = number % 10
+        var tmpNumber = number % 10
         for (i in 1..digitsCount) {
             tmpNumber *= 10
         }
@@ -367,28 +368,19 @@ fun hasDifferentDigits(n: Int): Boolean {
 fun squareSequenceDigit(n: Int): Int {
     var counter = 0
     var number = 1
-    var digitNumber = n
     var result = 0
-    var squareNum = 0
-    var countDigits = 0
-    var squareCount = 0
-    for (i in 1..digitNumber) {
-        squareNum = number * number
-        //println(squareNum)
+    for (i in 1..n) {
+        var squareNum = number * number
         // определим количество цифр в квадрате числа, чтобы посчитать их индексы
-        countDigits = 0
+        var countDigits = 0
         while (squareNum >= 1) {
             countDigits += 1
             squareNum /= 10
         }
-        //println(countDigits)
         squareNum = number * number // восстанавливаем значение
 
-        squareCount = counter + countDigits
-        for (i in 1..countDigits) {
-            print(squareNum % 10)
-            print(" - ")
-            println(squareCount)
+        var squareCount = counter + countDigits
+        for (k in 1..countDigits) {
             if (squareCount == n) {
                 result = squareNum % 10
                 return result
@@ -398,23 +390,15 @@ fun squareSequenceDigit(n: Int): Int {
         }
         counter += countDigits
         squareNum = number * number // восстанавливаем значение
-//        while (squareNum / 10 >= 1) {
-//            println(squareNum)
-//
-//        }
-
         if (squareNum / 10 < 1) {
-            //counter += 1
             if (counter == n) {
                 result = squareNum % 10
                 return result
             }
             squareNum /= 10
         }
-
         number += 1
     }
-    println()
     return result
 }
 
@@ -430,15 +414,11 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var number = 1
     var prevNumber = 0
-    var tmp = 0
     var result = 0
     var counter = 0
-    var digitCounter = 0
-    var tmpCounter = 0
-    var tmpNumber = 0
     for (i in 1..n) {
-        digitCounter = 0
-        tmpNumber = number
+        var digitCounter = 0
+        var tmpNumber = number
         // определяем количество цифр в числе
         while (tmpNumber >= 1) {
             digitCounter += 1
@@ -448,18 +428,17 @@ fun fibSequenceDigit(n: Int): Int {
         tmpNumber = number // восстанавливаем значение для дальнейшей обработки
         // определяем порядковый номер каждой цифры и
         // сравниваем с заданным в аргументе функции
-        tmpCounter = counter
+        var tmpCounter = counter
         while (tmpNumber >= 1) {
             if (tmpCounter == n) {
                 result = tmpNumber % 10
-                //breakfree = true
                 break
             }
             tmpNumber /= 10
             tmpCounter -= 1
         }
         // генерация следующего числа последовательности
-        tmp = number
+        val tmp = number
         number += prevNumber
         prevNumber = tmp
     }

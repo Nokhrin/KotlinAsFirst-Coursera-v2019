@@ -19,18 +19,36 @@ class Tests_optional {
 
     @Test
     @Tag("Easy")
-    fun fibLoop() {
-        assertEquals(1, fibLoop(1))
-        assertEquals(1, fibLoop(2))
-        assertEquals(2, fibLoop(3))
-        assertEquals(5, fibLoop(5))
-        assertEquals(21, fibLoop(8))
-        assertEquals(102334155, fibLoop(40))
-        assertEquals(1134903170, fibLoop(45))
-        assertEquals(1836311903, fibLoop(46))
-        // Just to calculate it
-        fibLoop(50)
+    fun fibRec() {
+        assertEquals(1, fibRec(1))
+        assertEquals(1, fibRec(2))
+        assertEquals(2, fibRec(3))
+        assertEquals(5, fibRec(5))
+        assertEquals(21, fibRec(8))
+        assertEquals(102334155, fibRec(40))
+        assertEquals(1134903170, fibRec(45))
+        assertEquals(1836311903, fibRec(46))
+        // уже на 47м числе происходит переполнение Int
+        fibRec(50)
     }
 
+    @Test
+    @Tag("Easy")
+    fun isCoPrimeSpeedTest() {
+        assertTrue(isCoPrime(25, 49))
+        assertFalse(isCoPrime(6, 8))
+        assertTrue(isCoPrime(17, 97))
+        assertFalse(isCoPrime(37, 111))
+        assertTrue(isCoPrime(1234567890, 908765431))
+        assertTrue(isCoPrime(2109876543, 1234567891))
+        assertTrue(isCoPrime(23, 17))
+        assertFalse(isCoPrime(28, 18))
+        assertTrue(isCoPrime(1234567890, 908765431))
+        assertTrue(isCoPrime(2109876543, 1234567891))
+        assertTrue(isCoPrime(1234567890, 908765431))
+        assertTrue(isCoPrime(2109876543, 1234567891))
+        assertTrue(isCoPrime(1234567890, 908765431))
+        assertFalse(isCoPrime(2147483647, Int.MAX_VALUE))
+    }
 
 }

@@ -84,7 +84,7 @@ class Tests {
         assertEquals(102334155, fib(40))
         assertEquals(1134903170, fib(45))
         assertEquals(1836311903, fib(46))
-        // Just to calculate it
+        // уже на 47м числе происходит переполнение Int
         fib(50)
     }
 
@@ -139,6 +139,9 @@ class Tests {
         assertFalse(isCoPrime(37, 111))
         assertTrue(isCoPrime(1234567890, 908765431))
         assertTrue(isCoPrime(2109876543, 1234567891))
+        assertTrue(isCoPrime(23, 17))
+        assertFalse(isCoPrime(28, 18))
+        assertFalse(isCoPrime(2147483647, Int.MAX_VALUE))
     }
 
     @Test
