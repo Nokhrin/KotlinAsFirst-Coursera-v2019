@@ -402,8 +402,8 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    // создадим списки стоимости и массы
-    // добавим нулевой индекс, добавим туда 0 для последуюзего удобства чтения программы (чтобы не путаться в индексах)
+    // создадим списки весов и стоимости
+    // добавим нулевой индекс, добавим туда 0 для последующего удобства чтения программы (чтобы не путаться в индексах)
     val weightsList = mutableListOf<Int>()
     weightsList.add(0)
     val pricesList = mutableListOf<Int>()
@@ -412,9 +412,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         weightsList.add(it.value.first)
         pricesList.add(it.value.second)
     }
-    // проверка списков
-//    println("веса: $weightsList")
-//    println("цены: $pricesList")
 
     // создаем таблицу мемоизации для хранения комбинаций предметов от нулевого до i-го
     // таблица - двумерный массив
@@ -430,26 +427,20 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         memtable += row
     }
-    // проверка нулевого массива
-//    for (row in memtable) {
-//        for (value in row) {
-//            print("$value ")
-//        }
-//        println()
-//    }
 
-    // заполняем массив
-    for (i in 0..treasures.count() - 1) {
-        for (w in 0..capacity - 1) {
+    // заполняем таблицу мемоизации
+    for (i in 0 until treasures.count()) { // переход по строкам
+        for (w in 0 until capacity) { // переход по столбцам
             // если ничего не взяли
-            if (i == 0 || w == 0) {
+            if (i == 0 || w == 0) { // то есть, строка или столбец с индексом 0
                 memtable[i][w] = 0
             } else if (weightsList[i] <= w) { // если масса текущего предмета укладывается в текущую вместимость
+                // (то есть не превышает индекс стобца)
                 // добавление в списки цен и весов 0 в нулевой индекс позволяет обращаться к этим спискам по i
                 memtable[i][w] = // если рассчитанная новая цена меньше предыдущей, она затирается предыдущей
                     max(
-                        pricesList[i] + memtable[i - 1][w - weightsList[i]],
-                        memtable[i - 1][w]
+                        pricesList[i] + memtable[i - 1][w - weightsList[i]], // стоимость текущего предмета
+                        memtable[i - 1][w] // стоимость предыдущего предмета
                     )
             } else {
                 // если масса не укладывается, копируем предыдущий элемент
@@ -457,13 +448,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             }
         }
     }
-    // проверка массива
-//    for (row in memtable) {
-//        for (value in row) {
-//            print("$value\t")
-//        }
-//        println()
-//    }
+
     // получение названий предметов
     // идем по списку предметов в обратном порядке, вычитаем массу из вместимости, запоминаем порядковый номер
     val resultList = mutableListOf<Int>()
@@ -471,7 +456,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     for (i in treasures.count() - 1 downTo 1) {
         // если в предыдущей строке в этом же столбце масса такая же, значит, объект не брали, переходим к следующему индексу
         if (memtable[i][weightLeft] != memtable[i - 1][weightLeft]) {
-//            println(memtable[i][weightLeft])
             weightLeft -= weightsList[i]
             resultList.add(i - 1)
         }
@@ -484,19 +468,4 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     } else {
         result
     }
-}
-
-fun main() {
-    println(
-        bagPacking(
-            mapOf(
-                "Греча" to (3 to 20),
-                "Чипсы" to (1 to 30),
-                "Кубок" to (2 to 10),
-                "Слиток" to (2 to 20),
-                "Мороженка" to (1 to 10)
-            ),
-            5
-        )
-    )
 }

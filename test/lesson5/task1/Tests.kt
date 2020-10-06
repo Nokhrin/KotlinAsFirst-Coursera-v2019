@@ -328,7 +328,31 @@ class Tests {
                 450
             )
         )
+        assertEquals(
+            setOf("Чипсы", "Греча"),
+            bagPacking(
+                mapOf(
+                    "Греча" to (3 to 20),
+                    "Чипсы" to (1 to 30),
+                    "Кубок" to (2 to 10),
+                    "Слиток" to (2 to 20),
+                    "Мороженка" to (1 to 10)
+                ),
+                5
+            )
+        )
+        assertEquals(
+            setOf("Чипсы", "Кубок", "Слиток"),
+            bagPacking(
+                mapOf(
+                    "Греча" to (3 to 20),
+                    "Чипсы" to (1 to 30),
+                    "Кубок" to (2 to 10),
+                    "Слиток" to (2 to 40),
+                    "Мороженка" to (1 to 10)
+                ),
+                6
+            )
+        )
     }
-
-    // TODO: map task tests
 }

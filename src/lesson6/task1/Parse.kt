@@ -2,6 +2,9 @@
 
 package lesson6.task1
 
+import java.lang.NumberFormatException
+import kotlin.reflect.typeOf
+
 /**
  * Пример
  *
@@ -42,7 +45,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun main() {
+fun mainConsole() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -69,7 +72,68 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val input = str.split(" ").toMutableList()
+    // проверим, что введенная строка состоит из трёх элементов
+    if (input.size != 3) return ""
+    // определим номер месяца с помощью словаря
+    val monthsNumbers = mapOf(
+        "января" to "01",
+        "февраля" to "02",
+        "марта" to "03",
+        "апреля" to "04",
+        "мая" to "05",
+        "июня" to "06",
+        "июля" to "07",
+        "августа" to "08",
+        "сентября" to "09",
+        "октября" to "10",
+        "ноября" to "11",
+        "декабря" to "12"
+    )
+    // проверим написание имени месяца,
+    // если имя некорректно, возвращаем пустую строку
+    if (input[1] !in monthsNumbers.keys) {
+        return ""
+    }
+    // проверяем номер введенного дня
+    // должен быть < 0 и меньше принятого для заданного месяца
+    val days = mapOf(
+        "января" to 0..31,
+        "февраля" to 0..29,
+        "марта" to 0..31,
+        "апреля" to 0..30,
+        "мая" to 0..31,
+        "июня" to 0..30,
+        "июля" to 0..31,
+        "августа" to 0..31,
+        "сентября" to 0..30,
+        "октября" to 0..31,
+        "ноября" to 0..30,
+        "декабря" to 0..31
+    )
+    if (input[0].toInt() in days[input[1]] ?: error("")) {
+        if (input[0].toInt() < 10) {
+            // добавляем ведущий ноль числам от 1 до 9
+            input[0] = "0" + input[0]
+        }
+        if (input[0] == "29" && input[1] == "февраля") {
+            // проверяем год на високосность
+            val year = input[2].toInt()
+            // формулировка "по тексту": високосный, если кратен 4 и не кратен 100 или если кратен 400
+//            if (!((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) {
+//                return ""
+//            }
+            // условие без отрицания - для тренировки
+            // если кратен 100 и не кратен 400 или не кратен 4
+            if ((year % 100 == 0 && year % 400 != 0) || year % 4 != 0) {
+                return ""
+            }
+        }
+        return input[0] + "." + monthsNumbers[input[1]] + "." + input[2]
+    }
+    return ""
+}
 
 /**
  * Средняя
@@ -81,7 +145,69 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val input = digital.split(".").toMutableList()
+    // если в полученном списке количество элементов меньше или больше 3, то формат неверен
+    if (input.size != 3) return ""
+    // проверяем, являются ли полученные подстроки числами
+    input.forEach {
+        // перехват ошибки конвертации строки в число
+        // если элемент не является числом, то формат неверен
+        try {
+            it.toInt()
+        } catch (e: NumberFormatException) {
+            return ""
+        }
+    }
+    // проверим значение месяца
+    if (input[1].toInt() !in 1..12) return ""
+    // проверим значение числа
+    if (input[1].toInt() !in 1..31) return ""
+    // на этом этапе считаем, что формат верный
+    // переходим к интерпретации ввода
+    // введем словарь для имен месяцев
+    val monthNames = mapOf(
+        "01" to "января",
+        "02" to "февраля",
+        "03" to "марта",
+        "04" to "апреля",
+        "05" to "мая",
+        "06" to "июня",
+        "07" to "июля",
+        "08" to "августа",
+        "09" to "сентября",
+        "10" to "октября",
+        "11" to "ноября",
+        "12" to "декабря"
+    )
+    // введем словарь для допустимых диапазонов чисел в месяцах
+    val days = mapOf(
+        "01" to 0..31,
+        "02" to 0..29,
+        "03" to 0..31,
+        "04" to 0..30,
+        "05" to 0..31,
+        "06" to 0..30,
+        "07" to 0..31,
+        "08" to 0..31,
+        "09" to 0..30,
+        "10" to 0..31,
+        "11" to 0..30,
+        "12" to 0..31
+    )
+    // проверим вхождение числа в указанный месяц
+    if (!(days[input[1]]?.contains(input[0].toInt()))!!) return ""
+    // проверим високосность
+    if (input[0] == "29" && input[1] == "02") {
+        val year = input[2].toInt()
+        // если 29 февраля в невисокосном году, ввод неверен
+        if ((year % 100 == 0 && year % 400 != 0) || year % 4 != 0) return ""
+    }
+    // на этом этапе ввод считаем корректным
+    input[0] = input[0].toInt().toString() // избавляемся от ведущего 0 в числе
+    input[1] = monthNames[input[1]].toString()
+    return input.joinToString(separator = " ")
+}
 
 /**
  * Средняя
@@ -97,7 +223,39 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    // создадим список разрешенных символов
+    // будем использовать его для определения допустимости символов
+    val legalSymbols = listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", "-", "+", "(", ")")
+    // представим введеную строку в виде списка ее символов
+    val input = phone.chunked(1)
+    // если находим недопустимый символ, прекращаем работу
+    input.forEach {
+        if (it !in legalSymbols) return ""
+    }
+    // удаляем все символы, кроме цифр и скобок
+    val filteredInput = input.filter { it in listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9") }
+    // проверяем скобки - они должны идти парой строго ( ) и с числом между друг другом
+    // ( и ) должны встречаться только единожды
+    if (input.filter { it == "(" }.count() > 1 ||
+        input.filter { it == ")" }.count() > 1
+    ) {
+        return ""
+    }
+    // если скобка ( идет после ) или между скобками ( и ) нет символом, то ввод неверен
+    if (input.indexOf("(") > input.indexOf(")") || input.indexOf(")") - input.indexOf("(") == 1) {
+        return ""
+    }
+    var result = ""
+    // напишем плюс, если он задан на входе
+    if (input[0] == "+") result += "+"
+    result += filteredInput.joinToString(separator = "")
+    return result
+}
+
+fun main() {
+    println(flattenPhoneNumber("+12 () 4-5"))
+}
 
 /**
  * Средняя

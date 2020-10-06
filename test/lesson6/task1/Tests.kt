@@ -40,7 +40,9 @@ class Tests {
         assertEquals("", dateStrToDigit("23"))
         assertEquals("03.04.2011", dateStrToDigit("3 апреля 2011"))
         assertEquals("", dateStrToDigit("32 сентября 2011"))
-        assertEquals("", dateStrToDigit("29 февраля 1993"))
+        assertEquals("", dateStrToDigit("29 февраля 1993")) // 29 февраля в невисокосный год
+        assertEquals("29.02.2000", dateStrToDigit("29 февраля 2000")) // 29 февраля в редкий високосный год
+        assertEquals("29.02.2020", dateStrToDigit("29 февраля 2020")) // 29 февраля в високосный год
     }
 
     @Test
@@ -52,7 +54,9 @@ class Tests {
         assertEquals("3 апреля 2011", dateDigitToStr("03.04.2011"))
         assertEquals("", dateDigitToStr("ab.cd.ef"))
         assertEquals("", dateDigitToStr("32.09.2011"))
-        assertEquals("", dateDigitToStr("29.02.1993"))
+        assertEquals("", dateDigitToStr("29.02.1993")) // 29 февраля в невисокосный год
+        assertEquals("29 февраля 2000", dateDigitToStr("29.02.2000")) // 29 февраля в редкий високосный год
+        assertEquals("29 февраля 2020", dateDigitToStr("29.02.2020")) // 29 февраля в високосный год
     }
 
     @Test
@@ -66,6 +70,8 @@ class Tests {
         assertEquals("+42566789", flattenPhoneNumber("+42(56 -- 67)89"))
         assertEquals("", flattenPhoneNumber("ab-123"))
         assertEquals("", flattenPhoneNumber("134_+874"))
+        assertEquals("", flattenPhoneNumber("+42(56 -- 6789")) // проверка с некорректными скобками
+        assertEquals("", flattenPhoneNumber("+42(56 -- 67()89")) // проверка с некорректными скобками
     }
 
     @Test
