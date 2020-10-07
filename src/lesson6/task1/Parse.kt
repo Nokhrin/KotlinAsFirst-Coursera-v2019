@@ -292,7 +292,16 @@ fun bestLongJump(jumps: String): Int? {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int? {
+    val regex = "\\d+ \\+".toRegex() // регулярка для поиска "от одной и более цифры, пробел, +"
+    val matchedResults = mutableListOf<Int>()
+    regex.findAll(jumps).forEach {
+        // соберем найденные подходящие значения, конвертируем в Int
+        matchedResults.add(it.value.split(" ")[0].toInt())
+    }
+    if (matchedResults.isEmpty()) return -1
+    return matchedResults.max()
+}
 
 /**
  * Сложная
