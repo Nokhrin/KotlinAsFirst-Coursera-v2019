@@ -235,6 +235,8 @@ class Tests {
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
+        assertTrue(canBuildFrom(listOf('A'), "A"))
+        assertTrue(canBuildFrom(listOf('a', 'a', 'a', 'a', 'a', 'a', 'p', 'a'), "P"))
     }
 
     @Test
@@ -292,6 +294,21 @@ class Tests {
                 )
             )
         )
+        assertEquals(
+            mapOf(
+                "0" to setOf("2", "3"),
+                "2" to setOf("3"),
+                "1" to setOf("0", "2", "3"),
+                "3" to setOf()
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "0" to setOf("2"),
+                    "2" to setOf("3"),
+                    "1" to setOf("0")
+                )
+            )
+        )
     }
 
     @Test
@@ -308,6 +325,10 @@ class Tests {
         assertEquals(
             Pair(-1, -1),
             findSumOfTwo(listOf(1, 2, 3), 6)
+        )
+        assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(1, 0), 1)
         )
     }
 
@@ -352,6 +373,15 @@ class Tests {
                     "Мороженка" to (1 to 10)
                 ),
                 6
+            )
+        )
+        assertEquals(
+            setOf("0"),
+            bagPacking(
+                mapOf(
+                    "0" to (1 to 1)
+                ),
+                1
             )
         )
     }

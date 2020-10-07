@@ -253,10 +253,6 @@ fun flattenPhoneNumber(phone: String): String {
     return result
 }
 
-fun main() {
-    println(flattenPhoneNumber("+12 () 4-5"))
-}
-
 /**
  * Средняя
  *
@@ -267,7 +263,23 @@ fun main() {
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int? {
+    val inputList = jumps.split(" ").toList()
+    val numbers = mutableListOf<Int>()
+    inputList.forEach {
+        // если нашли число
+        if (it.matches("-?\\d+(\\.\\d+)?".toRegex())) {
+            numbers.add(it.toInt()) // конвертируем строку в число и запоминаем
+        } else {
+            // если нашли запрещенную строку
+            if (it != "-" && it != "%") return -1 // завершаем выполнение
+        }
+    }
+    // если ввод не содержит чисел
+    if (numbers.isEmpty()) return -1 // завершаем выполнение
+    // находим максимальное
+    return numbers.max()
+}
 
 /**
  * Сложная

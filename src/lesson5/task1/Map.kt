@@ -114,11 +114,11 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> =
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     a.forEach { (k, v) ->
-        if (b.containsKey(k) && b[k] == v) {
-            return true
+        if (!b.contains(k) || b[k] != v) {
+            return false
         }
     }
-    return false
+    return true
 }
 
 /**
@@ -237,10 +237,13 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    // приводим к нижнему регистру, удаляем повторы букв
+    // приводим к нижнему регистру список букв
+    val charList = mutableListOf<Char>()
+    chars.forEach { charList.add(it.toLowerCase()) }
+    // приводим слова к нижнему регистру, удаляем повторы букв, сохраняем в виде хэш-таблицы
     val wordList = word.map { it.toLowerCase() }.distinct()
-    // если буква из слова не найдена, указанное слово составить нельзя
-    wordList.forEach { char -> if (chars.indexOf(char) == -1) return false }
+    // если буква в слове не найдена, указанное слово составить нельзя
+    wordList.forEach { char -> if (charList.indexOf(char.toLowerCase()) == -1) return false }
     return true
 }
 
@@ -306,45 +309,53 @@ fun hasAnagrams(words: List<String>): Boolean {
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val resultMap = mutableMapOf<String, MutableSet<String>>()
-    for ((k, v) in friends) {
-//        println("$k has $v")
-        if (!resultMap.containsKey(k)) {
-            resultMap[k] = v.toMutableSet()
-        }
-        // добавление друзей как ключей финального массива
-        for (name in v) { // добавляем имя как ключ в финальный массив, если его там еще нет
-            if (!resultMap.containsKey(name)) {
-                resultMap[name] = mutableSetOf()
-            }
-//            println("$k - $v - $name")
-//            println(resultMap)
-            // есть ли это имя в заданном списке
-            // если нет, пропусть добавление его друзей, оставить множество пустым
-            if (friends.containsKey(name)) {
-                for (friend in friends.getValue(name)) { // добавляем друзей друга во множество
-                    //                println("$name has $friend")
-                    resultMap[name]?.add(friend)
-                }
-            }
-        }
+    val resultMap = mutableMapOf<String, Set<String>>()
+
+    // просмотрим входные данные
+    friends.forEach { (name, buddy) ->
+//        println("$name - ${friends[buddy]}")
     }
 
-    for ((key, value) in resultMap) {
-//        println("${value}")
-        for (person in value) {
-//            println(friends[person])
-            friends[person]?.forEach {
-                if (it != key) {
-                    value.add(it)
-                }
-            }
-        }
-        value.toSet()
-    }
-    resultMap.toMap()
+
+
+//        val tempFriendsSet = mutableSetOf<String>()
+//        println("$name : $buddy")
+//        // копируем всех друзей человека, указанных во входных данных
+//        tempFriendsSet.addAll(buddy)
+//        println("tempFriendsSet is $tempFriendsSet")
+//        // просматриваем список друзей друга, копируем
+//        buddy.forEach {
+////            println("$name knows $it")
+////            println("$it knows " + friends[it].values)
+//            // если этого имени нет в общем списке, добавляем
+//            if (!resultMap.contains(it)) {
+//                resultMap[it] = setOf()
+//            }
+//            resultMap[it]?.let { it1 -> tempFriendsSet.addAll(it1) }
+//            println("tempFriendsSet is $tempFriendsSet")
+//            // проходим по строкам (именам) в списке друзей друга
+//            resultMap[name] = tempFriendsSet
+//        }
+//    }
     println(resultMap)
     return resultMap
+}
+
+fun main() {
+    propagateHandshakes(
+        mapOf(
+            "0" to setOf("2"),
+            "2" to setOf("3"),
+            "1" to setOf("0")
+        )
+    )
+//    propagateHandshakes(
+//        mapOf(
+//            "0" to setOf("2"),
+//            "2" to setOf("3"),
+//            "1" to setOf("0")
+//        )
+//    )
 }
 
 /**
@@ -366,13 +377,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     if (list.isNotEmpty()) { // список не пустой
-        // forEach - нерационально, потому что проверять последнее число в этой задаче - избыточно
-        for (item in list[0]..list[list.size - 1]) {
+        list.forEach {
             // от (позиции числа + 1) - чтобы не складывать с самим собой
-            for (index in list.indexOf(item) + 1 until list.size) {
+            for (index in list.indexOf(it) + 1 until list.size) {
                 // возвращаем числа, сумма которых первой дала искомый результат
-                if (item + list[index] == number) {
-                    return Pair(list.indexOf(item), index)
+                if (it + list[index] == number) {
+                    return Pair(list.indexOf(it), index)
                 }
             }
         }
