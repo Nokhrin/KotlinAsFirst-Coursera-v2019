@@ -217,7 +217,7 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var resultList = mutableListOf<Int>()
+    val resultList = mutableListOf<Int>()
     var divisor = 2
     var number = n
     while (number > 1) {
@@ -242,7 +242,6 @@ fun factorizeToString(n: Int): String {
     var number = n
     var divider = 2
     val listDividers = mutableListOf<Int>()
-    var result = ""
     while (number > 1) {
         while (number % divider != 0) { // ищем делитель от минимального возможного,
             // поэтому результат в массиве сразу упорядочен по возрастанию
@@ -252,8 +251,7 @@ fun factorizeToString(n: Int): String {
         number /= divider
         divider = 2
     }
-    result = listDividers.joinToString(separator = "*")
-    return result
+    return listDividers.joinToString(separator = "*")
 }
 
 /**
@@ -265,7 +263,7 @@ fun factorizeToString(n: Int): String {
  */
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
-    var nextN = 0
+    var nextN: Int
     val resultList = mutableListOf<Int>()
     while (true) { // находим цифры в base-ичной системе
         nextN = number % base
@@ -290,10 +288,10 @@ fun convert(n: Int, base: Int): List<Int> {
  * (например, n.toString(base) и подобные), запрещается.
  */
 fun convertToString(n: Int, base: Int): String {
-    var result = ""
     var number = n
     val resultList = mutableListOf<String>()
-    var input = ""
+    var input: String
+    if (number == 0) return "0"
     while (number != 0) {
         input = if (number % base > 9) {
             (number % base + 87).toChar().toString()
@@ -303,8 +301,7 @@ fun convertToString(n: Int, base: Int): String {
         resultList.add(0, input)
         number /= base
     }
-    result = resultList.joinToString(separator = "")
-    return result
+    return resultList.joinToString(separator = "")
 }
 
 /**
@@ -335,39 +332,39 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val List = mutableListOf<String>()
-    List += str.chunked(1)
-    for (i in List.indices) {
-        when (List[i]) {
-            "a" -> List[i] = "10"
-            "b" -> List[i] = "11"
-            "c" -> List[i] = "12"
-            "d" -> List[i] = "13"
-            "e" -> List[i] = "14"
-            "f" -> List[i] = "15"
-            "g" -> List[i] = "16"
-            "h" -> List[i] = "17"
-            "i" -> List[i] = "18"
-            "j" -> List[i] = "19"
-            "k" -> List[i] = "20"
-            "l" -> List[i] = "21"
-            "m" -> List[i] = "22"
-            "n" -> List[i] = "23"
-            "o" -> List[i] = "24"
-            "p" -> List[i] = "25"
-            "q" -> List[i] = "26"
-            "r" -> List[i] = "27"
-            "s" -> List[i] = "28"
-            "t" -> List[i] = "29"
-            "u" -> List[i] = "30"
-            "v" -> List[i] = "31"
-            "w" -> List[i] = "32"
-            "x" -> List[i] = "33"
-            "y" -> List[i] = "34"
-            "z" -> List[i] = "35"
+    val list = mutableListOf<String>()
+    list += str.chunked(1)
+    for (i in list.indices) {
+        when (list[i]) {
+            "a" -> list[i] = "10"
+            "b" -> list[i] = "11"
+            "c" -> list[i] = "12"
+            "d" -> list[i] = "13"
+            "e" -> list[i] = "14"
+            "f" -> list[i] = "15"
+            "g" -> list[i] = "16"
+            "h" -> list[i] = "17"
+            "i" -> list[i] = "18"
+            "j" -> list[i] = "19"
+            "k" -> list[i] = "20"
+            "l" -> list[i] = "21"
+            "m" -> list[i] = "22"
+            "n" -> list[i] = "23"
+            "o" -> list[i] = "24"
+            "p" -> list[i] = "25"
+            "q" -> list[i] = "26"
+            "r" -> list[i] = "27"
+            "s" -> list[i] = "28"
+            "t" -> list[i] = "29"
+            "u" -> list[i] = "30"
+            "v" -> list[i] = "31"
+            "w" -> list[i] = "32"
+            "x" -> list[i] = "33"
+            "y" -> list[i] = "34"
+            "z" -> list[i] = "35"
         }
     }
-    val numList = List.map { it.toInt() }
+    val numList = list.map { it.toInt() }
     var result = 0
     numList.forEachIndexed { i, d ->
         result += d * base.toDouble().pow(numList.size - i - 1).toInt()
@@ -386,7 +383,7 @@ fun decimalFromString(str: String, base: Int): Int {
 fun roman(n: Int): String {
     var number = n
     val romanList = mutableListOf<String>()
-    var result = ""
+    val result: String
     while (number != 0) {
         while (number / 1000 >= 1) {
             romanList.add("M")
@@ -455,7 +452,7 @@ fun roman(n: Int): String {
 fun russian(n: Int): String {
     var number = n
     val numberList = mutableListOf<String>()
-    var result = ""
+    val result: String
     // по нисходящей определяем:
     // сколько сотен, десятков, единиц
 
@@ -494,6 +491,7 @@ fun russian(n: Int): String {
                 9 -> numberList.add("девяносто")
             }
             number %= 10000
+            if (number / 1000 == 0) numberList.add("тысяч")
         }
 
         if (number / 10000 == 1) {
@@ -509,9 +507,9 @@ fun russian(n: Int): String {
                 8 -> numberList.add("восемнадцать")
                 9 -> numberList.add("девятнадцать")
             }
+            number %= 1000
             // с этими числами верна форма "тысяч"
             numberList.add("тысяч")
-            number %= 1000
         }
 
         if (number / 10000 == 0) {

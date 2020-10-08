@@ -115,7 +115,8 @@ fun dateStrToDigit(str: String): String {
     if (input[0].toInt() in days[input[1]] ?: error("")) {
         if (input[0].toInt() < 10) {
             // добавляем ведущий ноль числам от 1 до 9
-            input[0] = "0" + input[0]
+            // сбрасываем ведущие нули, которые могут попасть на входе с помощью конвертации в Int
+            input[0] = "0" + input[0].toInt().toString()
         }
         if (input[0] == "29" && input[1] == "февраля") {
             // проверяем год на високосность
@@ -312,7 +313,29 @@ fun bestHighJump(jumps: String): Int? {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val regex =
+        "^\\d+(( [\\+,\\-] \\d+)?)+".toRegex() // ищем по шаблону "число (([плюс или минус] число)да или нет)повтор"
+    if (!regex.matches(expression)) {
+        throw IllegalArgumentException("Формат входной строки неверен")
+    } else {
+        val matchedResults = expression.split(" ").toMutableList()
+        val sumList = mutableListOf<Int>()
+        sumList.add(matchedResults[0].toInt())
+        // если на входе больше одного значения
+        if (matchedResults.size > 1) {
+            for (index in 2 until matchedResults.size step 2) {
+                // просматриваем числа, меняем знак, если перед числом стоит минус
+                if (matchedResults[index - 1] == "-") {
+                    matchedResults[index] = (matchedResults[index].toInt() * (-1)).toString()
+                }
+                // складываем числа в отдельный список для суммирования
+                sumList.add(matchedResults[index].toInt())
+            }
+        }
+        return sumList.sum()
+    }
+}
 
 /**
  * Сложная

@@ -43,6 +43,7 @@ class Tests {
         assertEquals("", dateStrToDigit("29 февраля 1993")) // 29 февраля в невисокосный год
         assertEquals("29.02.2000", dateStrToDigit("29 февраля 2000")) // 29 февраля в редкий високосный год
         assertEquals("29.02.2020", dateStrToDigit("29 февраля 2020")) // 29 февраля в високосный год
+        assertEquals("01.01.1", dateStrToDigit("01 января 1"))
     }
 
     @Test
@@ -96,6 +97,7 @@ class Tests {
     @Tag("Hard")
     fun plusMinus() {
         assertEquals(0, plusMinus("0"))
+        assertEquals(10, plusMinus("10"))
         assertEquals(4, plusMinus("2 + 2"))
         assertEquals(6, plusMinus("2 + 31 - 40 + 13"))
         assertEquals(-1, plusMinus("0 - 1"))
