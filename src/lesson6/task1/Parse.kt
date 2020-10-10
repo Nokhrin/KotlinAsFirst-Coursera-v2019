@@ -2,6 +2,7 @@
 
 package lesson6.task1
 
+import lesson4.task1.convert
 import java.lang.NumberFormatException
 
 /**
@@ -379,9 +380,9 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     // проверяем формат строки
     // задаем корректный формат с помощью регулярного выражения
-    // возможно(последовательность НЕцифр и НЕспецзнаков (потому что кириллица), пробел, последовательность цифр,
+    // возможно(последовательность НЕспецзнаков (своеобразный метод исключения, чтобы оставить алфавит кириллицы), пробел, последовательность цифр,
     // возможно(точка и последовательность цифр), точка с запятой), обязательно(объект без точки с запятой и пробела)
-    val regex = "(([^0-9#\$%&@ ]+ \\d+(\\.\\d)?; )+)?[^0-9#\$%&@ ]+ \\d+\\.\\d".toRegex()
+    val regex = "(([^#\$%&@ ]+ \\d+(\\.\\d+)?; )+)?[^#\$%&@ ]+ \\d+(\\.\\d+)?".toRegex()
     // если формат верен, трансформируем список
     if (regex.matches(description)) {
         // конвертируем строку в список списков "строка - вещ.число"
@@ -406,9 +407,6 @@ fun mostExpensive(description: String): String {
     return ""
 }
 
-fun main() {
-    mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9")
-}
 /**
  * Сложная
  *
@@ -420,7 +418,44 @@ fun main() {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    // определим корректное римское число с помощью регулярного выражения
+    // разрешенные комбинации описаны здесь https://numeralsconverter.com/information/the-rules-of-roman-numerals/
+    val regex = "^(M{0,4})(D{0,1})(CM|CD|C{0,3})(L{0,1})(XC|XL|X{0,3})(V{0,3})(IX|IV|I{0,3})\$".toRegex()
+    // если ввод корректный, конвертируем
+    if (regex.matches(roman)) {
+        // словарь значений
+        val romanToArabic = mapOf(
+            "I" to 1,
+            "IV" to 4,
+            "V" to 5,
+            "IX" to 9,
+            "X" to 10,
+            "XL" to 40,
+            "L" to 50,
+            "XC" to 90,
+            "C" to 100,
+            "CD" to 400,
+            "D" to 500,
+            "CM" to 900,
+            "M" to 1000
+        )
+        // отсеиваем двойные
+        val filterDouble = "CM|CD|XC|XL|IX|IV".toRegex()
+        var converted = 0
+        var inputCopy = roman
+        filterDouble.findAll(roman).forEach {
+            converted += romanToArabic[it.value] ?: error("")
+            inputCopy = inputCopy.replace(it.value, "")
+        }
+        // inputCopy на этом этапе содержит только одиночные римские цифры. Просто суммируем по словарю.
+        inputCopy.forEach { letter ->
+            converted += romanToArabic[letter.toString()] ?: error("")
+        }
+        return converted
+    }
+    return -1
+}
 
 /**
  * Очень сложная
