@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
 
 /**
  * Пример
@@ -147,9 +148,33 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val outputStream = File(outputName).bufferedWriter()
+    // рассмотрим файл ввода построчно
+    val inputLines = File(inputName).readLines()
+    // найдем длину самой длинной строки
+    // далее используем trim, чтобы избавиться от пробелов перед и после строк, поданных на вход
+    var longest = 0
+    inputLines.forEach {
+        longest = max(longest, it.trim().length)
+    }
+    // сдвинем строки
+    inputLines.forEach {
+        // сдвиг определим как половину разницы длин самой длинной и рассматриваемой строк (l1 - l2) / 2
+        val shift = (longest - it.trim().length) / 2
+        var toPrint = " ".repeat(shift) + it.trim()
+        // если последняя строка, то не вставляем переход на новую строку
+        if (inputLines.indexOf(it) < inputLines.size - 1) {
+            toPrint += "\n"
+        }
+        println(toPrint)
+        outputStream.write(toPrint)
+    }
+    outputStream.close()
 }
 
+fun main() {
+    centerFile("input/center_in1.txt", "temp.txt")
+}
 /**
  * Сложная
  *
