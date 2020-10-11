@@ -4,6 +4,7 @@ package lesson6.task1
 
 import lesson4.task1.convert
 import java.lang.NumberFormatException
+import kotlin.IllegalArgumentException as IllegalArgumentException1
 
 /**
  * Пример
@@ -317,7 +318,7 @@ fun plusMinus(expression: String): Int {
     val regex =
         "^\\d+(( [\\+,\\-] \\d+)?)+".toRegex() // ищем по шаблону "число (([плюс или минус] число)да или нет)повтор"
     if (!regex.matches(expression)) {
-        throw IllegalArgumentException("Формат входной строки неверен")
+        throw IllegalArgumentException1("Формат входной строки неверен")
     } else {
         val matchedResults = expression.split(" ").toMutableList()
         val sumList = mutableListOf<Int>()
@@ -394,15 +395,20 @@ fun mostExpensive(description: String): String {
             // имеем хэш-таблицу вида "индекс=[значение1, значение2]"
             .map { it.value.map { it.value } } // приводим каждую группу к виду [значение1, значение2]
         // проверяем величину цен (>=0), находим максимальную цену
-        val priceList = mutableListOf<Float>()
+        val priceList = mutableListOf<Double>()
         preparedList.forEach {
             // цена не отрицательная?
-            if (it[1].toFloat() < 0) return ""
+            if (it[1].toDouble() < 0) return ""
             // собираем цены, индексы будут совпадать с исходным списком
-            priceList.add(it[1].toFloat())
+            priceList.add(it[1].toDouble())
         }
-        // возвращаем название товара с максимальной ценой
-        return preparedList[priceList.indexOf(priceList.max())][0]
+        // если максимальная цена = 0.0, возвращаем такой текст
+        return if (priceList.max() == 0.0) {
+            "Any good with price 0.0"
+        } else {
+            // возвращаем название товара с максимальной ценой
+            preparedList[priceList.indexOf(priceList.max())][0]
+        }
     }
     return ""
 }
@@ -493,4 +499,31 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    // проверяем ввод на запрещенные символы
+    val regex = "[\\<\\>\\+\\- ]+(\\[[\\[\\]\\<\\>\\+\\- ]+\\])?".toRegex()
+    if (!regex.matches(commands)) throw IllegalArgumentException1("Ввод содержит ошибочные символы")
+    // начальная позиция датчика -1, потому что отсчет с нуля
+    val startPosition = cells / 2 - 1
+    // начальные данные в ячейках - cells нулей
+    val workingCells = mutableListOf<Int>()
+    for (i in 0 until cells) {
+        workingCells.add(0)
+    }
+    // проходим действия, заданные commands
+    for (command in commands) {
+        println(command)
+
+    }
+    return listOf()
+}
+
+fun main() {
+    computeDeviceCells(10, "+>+>+>+>+", 10000)
+//    computeDeviceCells(10, "<-<-<-<-<-", 10000)
+//    computeDeviceCells(10, "- <<<<< +[>+]", 10000)
+//    computeDeviceCells(11, "<<<<< + >>>>>>>>>> --[<-] >+[>+] >++[--< <[<] >+[>+] >++]", 10000)
+//    computeDeviceCells(10, "===", 3)
+//    computeDeviceCells(10, "+>+>[+>", 3)
+//    computeDeviceCells(20, ">>>>>>>>>>>>>", 12)
+}
