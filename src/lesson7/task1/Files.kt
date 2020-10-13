@@ -166,15 +166,11 @@ fun centerFile(inputName: String, outputName: String) {
         if (inputLines.indexOf(it) < inputLines.size - 1) {
             toPrint += "\n"
         }
-        println(toPrint)
         outputStream.write(toPrint)
     }
     outputStream.close()
 }
 
-fun main() {
-    centerFile("input/center_in1.txt", "temp.txt")
-}
 /**
  * Сложная
  *
@@ -203,7 +199,58 @@ fun main() {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    // из правил следует, что все пробелы в начале и конце строк при чтении файла следует удалить
+    // множественные пробелы между словами заменить одинарными (условие 7)
+    val inputLines = File(inputName).readLines().map { it.trim().replace(" {2,}".toRegex(), " ") }
+    val outputStream = File(outputName).bufferedWriter()
+
+    // найдем максимальную строку и ее длину
+    val maxLength = (inputLines.maxBy { it.length })?.length
+
+    // выравниваем
+    var counter = inputLines.size
+    inputLines.forEach {
+        counter -= 1
+        // пропускаем пустые строки, строки с максимальными длинами, строки из одного слова
+        if (0 < it.length && it.length < maxLength!! && it.split(" ").size > 1) {
+            // сколько пробелов нужно добавить в текущую строку?
+            val spacesToPaste = maxLength - it.length
+            val stringList = it.split(" ").toMutableList()
+            // необходимое число итераций для заполнения пробелами
+            // общее число недостающих пробелов делим на число пробелов в строке
+            // добавляем 1 - это минимальный (=одиночный) "пробел" между словами в строках, которые необходимо растянуть
+            val iterationsToPaste = spacesToPaste / (stringList.size - 1) + 1
+
+            // собираем список строк
+            val spacedLine = mutableListOf<String>()
+            for (i in 0 until stringList.size) {
+                spacedLine.add(stringList[i])
+                // не включаем пробелы после последнего слова
+                if (i < stringList.size - 1) {
+                    spacedLine.add(" ".repeat(iterationsToPaste))
+                }
+            }
+
+            // добавляем пробелы, которых не хватило до полной строки
+            val lastSpaces = spacesToPaste % (stringList.size - 1)
+            if (lastSpaces > 0) {
+                var index = 1
+                for (i in 0 until lastSpaces) {
+                    spacedLine[index] = spacedLine[index] + " "
+                    index += 2
+                }
+            }
+            outputStream.write(spacedLine.joinToString(separator = ""))
+        } else {
+            // выводим строку без изменений - она соответствует требованиям
+            outputStream.write(it)
+        }
+        // если последняя строка файла, не делать переход на новую строку
+        if (counter > 0) {
+            outputStream.newLine()
+        }
+    }
+    outputStream.close()
 }
 
 /**
@@ -224,7 +271,38 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val result = mutableMapOf<String, Int>()
+    val inputText = File(inputName).readText()
+    // регулярка с символами, принятыми в качестве разделителей
+    val regex = "[^\\p{IsCyrillic}[a-zA-Z]]".toRegex()
+    // оставляем непустые строки (фильтруем, удаляем пробелы, приводим к нижнему регистру)
+    val allWords =
+        inputText.split(regex).map { it.trim().toLowerCase() }.filter { it.isNotEmpty() }.toMutableList()
+    allWords.forEach { word ->
+        var wordCount = 0
+        allWords.forEach {
+            if (word == it) {
+                wordCount += 1
+            }
+        }
+        result[word] = wordCount
+    }
+    val counts = result.toList().sortedByDescending { (_, value) -> value }.toMap()
+
+    val toReturn = mutableMapOf<String, Int>()
+    if (counts.size > 20) {
+        var counter = 20
+        for ((k, v) in counts) {
+            toReturn[k] = v
+            counter -= 1
+            if (counter == 0) break
+        }
+    } else {
+        return counts
+    }
+    return toReturn
+}
 
 /**
  * Средняя
@@ -262,7 +340,28 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val inputText = File(inputName).readText()
+    val outputStream = File(outputName).bufferedWriter()
+    val resultList = mutableListOf<String>()
+    inputText.forEach { letter ->
+        if (dictionary.containsKey(letter.toUpperCase())) {
+            if (letter.isUpperCase()) {
+                resultList.add(dictionary[letter.toUpperCase()]?.toLowerCase()?.capitalize().toString())
+            } else {
+                resultList.add(dictionary[letter.toUpperCase()]?.toLowerCase().toString())
+            }
+        } else if (dictionary.containsKey(letter.toLowerCase())) {
+            if (letter.isUpperCase()) {
+                resultList.add(dictionary[letter.toLowerCase()]?.toLowerCase()?.capitalize().toString())
+            } else {
+                resultList.add(dictionary[letter.toLowerCase()]?.toLowerCase().toString())
+            }
+        } else {
+            resultList.add(letter.toString())
+        }
+    }
+    outputStream.write(resultList.joinToString(""))
+    outputStream.close()
 }
 
 /**

@@ -308,54 +308,88 @@ fun hasAnagrams(words: List<String>): Boolean {
  *          "Mikhail" to setOf("Sveta", "Marat")
  *        )
  */
+fun propagateHandshakes1(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val resultMap = mutableMapOf<String, Set<String>>()
+    // проходим по списку как по "веткам"
+    // запоминаем просмотренные
+    val visited = mutableListOf<String>()
+    // запоминаем людей без друзей
+    val noFriends = mutableListOf<String>()
+    // просматриваем всех людей
+    friends.forEach { (name, buddy) ->
+        // изучаемый объект записываем в просмотренные
+        visited.add(name)
+        // его друзей записываем в очередь
+        val queue = mutableSetOf<String>()
+        queue.addAll(buddy)
+        // переменная для сохранения промежуточного списка друзей
+        val addToQueue = mutableListOf<String>()
+        queue.forEach { friend ->
+            // если нет друзей
+            if (friends[friend].isNullOrEmpty() && friend !in noFriends) {
+                noFriends.add(friend)
+            }
+            // запоминаем, что просмотрели этого человека
+            if (friend !in visited) {
+                visited.add(friend)
+                // если друзья не в очереди, добавляем их в очередь
+                friends[friend]?.forEach {
+                    // не включаем самого человека в список его друзей
+                    if (it !in queue && it != name) {
+                        addToQueue.add(it)
+                    }
+                }
+            } else { // если объект уже в просмотренных, просто берем его найденных друзей
+                resultMap[friend]?.forEach {
+                    // не включаем самого человека в список его друзей
+                    if (it != name) {
+                        addToQueue.add(it)
+                    }
+                }
+            }
+        }
+        // записываем полный перечень друзей
+        queue.addAll(addToQueue)
+        resultMap[name] = queue
+        // добавляем людей без друзей как пустое множество
+        noFriends.forEach {
+            resultMap[it] = setOf()
+        }
+    }
+    println(resultMap)
+//        {9b=[], 0=[1, 43, 9b], 1=[43, 9b, 0], 43=[9b, 0, 1]}
+    return resultMap
+}
+
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val resultMap = mutableMapOf<String, Set<String>>()
+    // проходим по списку как по "веткам"
+    // запоминаем просмотренные
+    val visited = mutableListOf<String>()
+    // просматриваем всех людей
 
-    // просмотрим входные данные
-    friends.forEach { (name, buddy) ->
-//        println("$name - ${friends[buddy]}")
+    friends.forEach { (person, personFriends) ->
+        if (person !in visited) {
+            visited.add(person)
+            val queue = personFriends.toMutableList()
+            println("$person - $queue")
+            // проходим по очереди, находим все связи
+        }
     }
-
-
-
-//        val tempFriendsSet = mutableSetOf<String>()
-//        println("$name : $buddy")
-//        // копируем всех друзей человека, указанных во входных данных
-//        tempFriendsSet.addAll(buddy)
-//        println("tempFriendsSet is $tempFriendsSet")
-//        // просматриваем список друзей друга, копируем
-//        buddy.forEach {
-////            println("$name knows $it")
-////            println("$it knows " + friends[it].values)
-//            // если этого имени нет в общем списке, добавляем
-//            if (!resultMap.contains(it)) {
-//                resultMap[it] = setOf()
-//            }
-//            resultMap[it]?.let { it1 -> tempFriendsSet.addAll(it1) }
-//            println("tempFriendsSet is $tempFriendsSet")
-//            // проходим по строкам (именам) в списке друзей друга
-//            resultMap[name] = tempFriendsSet
-//        }
-//    }
     println(resultMap)
+//        {9b=[], 0=[1, 43, 9b], 1=[43, 9b, 0], 43=[9b, 0, 1]}
     return resultMap
 }
 
 fun main() {
     propagateHandshakes(
         mapOf(
-            "0" to setOf("2"),
-            "2" to setOf("3"),
-            "1" to setOf("0")
+            "9b" to setOf(),
+            "0" to setOf("1"),
+            "1" to setOf("43"),
+            "43" to setOf("9b", "0")
         )
     )
-//    propagateHandshakes(
-//        mapOf(
-//            "0" to setOf("2"),
-//            "2" to setOf("3"),
-//            "1" to setOf("0")
-//        )
-//    )
 }
 
 /**
