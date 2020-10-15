@@ -3,6 +3,7 @@
 package lesson5.task1
 
 import ru.spbstu.kotlin.typeclass.kind
+import java.util.Locale.filter
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.reflect.typeOf
@@ -308,89 +309,57 @@ fun hasAnagrams(words: List<String>): Boolean {
  *          "Mikhail" to setOf("Sveta", "Marat")
  *        )
  */
-fun propagateHandshakes1(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val resultMap = mutableMapOf<String, Set<String>>()
-    // проходим по списку как по "веткам"
-    // запоминаем просмотренные
-    val visited = mutableListOf<String>()
-    // запоминаем людей без друзей
-    val noFriends = mutableListOf<String>()
-    // просматриваем всех людей
-    friends.forEach { (name, buddy) ->
-        // изучаемый объект записываем в просмотренные
-        visited.add(name)
-        // его друзей записываем в очередь
-        val queue = mutableSetOf<String>()
-        queue.addAll(buddy)
-        // переменная для сохранения промежуточного списка друзей
-        val addToQueue = mutableListOf<String>()
-        queue.forEach { friend ->
-            // если нет друзей
-            if (friends[friend].isNullOrEmpty() && friend !in noFriends) {
-                noFriends.add(friend)
-            }
-            // запоминаем, что просмотрели этого человека
-            if (friend !in visited) {
-                visited.add(friend)
-                // если друзья не в очереди, добавляем их в очередь
-                friends[friend]?.forEach {
-                    // не включаем самого человека в список его друзей
-                    if (it !in queue && it != name) {
-                        addToQueue.add(it)
-                    }
-                }
-            } else { // если объект уже в просмотренных, просто берем его найденных друзей
-                resultMap[friend]?.forEach {
-                    // не включаем самого человека в список его друзей
-                    if (it != name) {
-                        addToQueue.add(it)
-                    }
-                }
-            }
-        }
-        // записываем полный перечень друзей
-        queue.addAll(addToQueue)
-        resultMap[name] = queue
-        // добавляем людей без друзей как пустое множество
-        noFriends.forEach {
-            resultMap[it] = setOf()
-        }
-    }
-    println(resultMap)
-//        {9b=[], 0=[1, 43, 9b], 1=[43, 9b, 0], 43=[9b, 0, 1]}
-    return resultMap
-}
 
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val resultMap = mutableMapOf<String, Set<String>>()
-    // проходим по списку как по "веткам"
-    // запоминаем просмотренные
-    val visited = mutableListOf<String>()
-    // просматриваем всех людей
+    // идея - использовать метод коллекций union, чтобы сформировать список всех рукопожатий
 
-    friends.forEach { (person, personFriends) ->
-        if (person !in visited) {
-            visited.add(person)
-            val queue = personFriends.toMutableList()
-            println("$person - $queue")
-            // проходим по очереди, находим все связи
-        }
+    // асс. массив для накопления информации о друзьях
+    // инициализируем его вводными данными
+    var resultMap = mutableMapOf<String, Set<String>>()
+    friends.forEach { person, friendsList ->
+        resultMap[person] = friendsList.toSet()
     }
-    println(resultMap)
-//        {9b=[], 0=[1, 43, 9b], 1=[43, 9b, 0], 43=[9b, 0, 1]}
+    // буфер для временного списка друзей
+    val finalResult = resultMap
+
+    // список людей без друзей
+    val empties = mutableListOf<String>()
+
+    // найдем пересечения одного со всеми
+    // чтобы найти все пересечения хватит числа итераций, равного числу объектов на вводе
+    var iCount = friends.keys.count()
+
+    while (iCount > 0) {
+        resultMap.forEach { (person, friendsList) ->
+            // буфер для хранения друзей друзей
+            val tmp = mutableListOf<String>()
+            tmp.addAll(friendsList)
+
+            friendsList.forEach { friend ->
+                // определяем людей без друзей
+                if (!resultMap.containsKey(friend) && !empties.contains(friend)) {
+                    empties.add(friend)
+                }
+                // объединяем найденных сейчас и найденных ранее
+                if (!resultMap[friend].isNullOrEmpty()) {
+                    tmp.addAll(friendsList.union(resultMap[friend]!!).filter { it != person })
+                }
+            }
+            // сохраняем найденных за эту итерацию
+            finalResult[person] = tmp.toSet()
+        }
+        // обновляем асс. массив всех друзей
+        resultMap = finalResult
+        iCount -= 1
+    }
+
+    // добавим людей без друзей с пустыми множествами
+    empties.forEach {
+        resultMap[it] = setOf()
+    }
     return resultMap
 }
 
-fun main() {
-    propagateHandshakes(
-        mapOf(
-            "9b" to setOf(),
-            "0" to setOf("1"),
-            "1" to setOf("43"),
-            "43" to setOf("9b", "0")
-        )
-    )
-}
 
 /**
  * Сложная

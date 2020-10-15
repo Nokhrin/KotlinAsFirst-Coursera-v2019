@@ -309,6 +309,51 @@ class Tests {
                 )
             )
         )
+        assertEquals(
+            mapOf(
+                "1" to setOf("289"),
+                "0" to setOf("1", "377", "289"),
+                "289" to setOf(),
+                "377" to setOf()
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "1" to setOf("289"),
+                    "0" to setOf("1", "377")
+                )
+            )
+        )
+        assertEquals(
+            mapOf(
+                "1" to setOf("0", "3"),
+                "0" to setOf("1", "3"),
+                "2" to setOf("0", "1", "3"),
+                "3" to setOf()
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "1" to setOf("0", "3"),
+                    "0" to setOf("1"),
+                    "2" to setOf("0")
+                )
+            )
+        )
+        assertEquals(
+            mapOf(
+                "0" to setOf("1"),
+                "1" to setOf(),
+                "2" to setOf("3", "0", "1"),
+                "3" to setOf("0", "1")
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "0" to setOf("1"),
+                    "1" to setOf(),
+                    "2" to setOf("3"),
+                    "3" to setOf("0")
+                )
+            )
+        )
     }
 
     @Test
