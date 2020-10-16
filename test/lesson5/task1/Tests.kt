@@ -395,29 +395,16 @@ class Tests {
             )
         )
         assertEquals(
-            setOf("Чипсы", "Греча"),
+            setOf("Чипсы", "Слиток"),
             bagPacking(
                 mapOf(
-                    "Греча" to (3 to 20),
-                    "Чипсы" to (1 to 30),
-                    "Кубок" to (2 to 10),
-                    "Слиток" to (2 to 20),
-                    "Мороженка" to (1 to 10)
+                    "Греча" to (3 to 1),
+                    "Чипсы" to (4 to 6),
+                    "Кубок" to (5 to 4),
+                    "Слиток" to (8 to 7),
+                    "Мороженка" to (9 to 6)
                 ),
-                5
-            )
-        )
-        assertEquals(
-            setOf("Чипсы", "Кубок", "Слиток"),
-            bagPacking(
-                mapOf(
-                    "Греча" to (3 to 20),
-                    "Чипсы" to (1 to 30),
-                    "Кубок" to (2 to 10),
-                    "Слиток" to (2 to 40),
-                    "Мороженка" to (1 to 10)
-                ),
-                6
+                13
             )
         )
         assertEquals(

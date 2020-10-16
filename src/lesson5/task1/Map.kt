@@ -414,71 +414,83 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
+
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    // создадим списки весов и стоимости
-    // добавим нулевой индекс, добавим туда 0 для последующего удобства чтения программы (чтобы не путаться в индексах)
+    // создадим списки весов, стоимости и имен предметов
     val weightsList = mutableListOf<Int>()
-    weightsList.add(0)
     val pricesList = mutableListOf<Int>()
-    pricesList.add(0)
+    val namesList = mutableListOf<String>()
     treasures.forEach {
         weightsList.add(it.value.first)
         pricesList.add(it.value.second)
+        namesList.add(it.key)
     }
+//    println("weights - $weightsList")
+//    println("prices - $pricesList")
+//    println("names - $namesList")
 
-    // создаем таблицу мемоизации для хранения комбинаций предметов от нулевого до i-го
-    // таблица - двумерный массив
-    var memtable = arrayOf<Array<Int>>()
-    // инициируем таблицу нулями
+    // введем понятие таблицы мемоизации - структуры для хранения возможных комбинаций объектов в рюкзаке
     // нули в первой строке и первом столбце - это базовые случаи, когда не взят ни один предмет или масса равна нулю
-    // количество строк = количеству предложенных предметов
-    for (i in 1..treasures.count()) {
-        // количество столбцов = возможным массам от 1 до допустимой с шагом 1
+
+    var memtable = arrayOf<Array<Int>>()
+    // число столбцов = числу элементов строки = числу дискретных значений массы с шагом 1
+    // число строк = предметы от нулевого (не взят ни один) до i-го
+    for (i in 0..treasures.size) {
         var row = arrayOf<Int>()
-        for (w in 1..capacity) {
+        for (j in 0..capacity) {
             row += 0
         }
         memtable += row
     }
 
-    // заполняем таблицу мемоизации
-    for (i in 0 until treasures.count()) { // переход по строкам
-        for (w in 0 until capacity) { // переход по столбцам
-            // если ничего не взяли
-            if (i == 0 || w == 0) { // то есть, строка или столбец с индексом 0
-                memtable[i][w] = 0
-            } else if (weightsList[i] <= w) { // если масса текущего предмета укладывается в текущую вместимость
-                // (то есть не превышает индекс стобца)
-                // добавление в списки цен и весов 0 в нулевой индекс позволяет обращаться к этим спискам по i
-                memtable[i][w] = // если рассчитанная новая цена меньше предыдущей, она затирается предыдущей
-                    max(
-                        pricesList[i] + memtable[i - 1][w - weightsList[i]], // стоимость текущего предмета
-                        memtable[i - 1][w] // стоимость предыдущего предмета
-                    )
-            } else {
-                // если масса не укладывается, копируем предыдущий элемент
-                memtable[i][w] = memtable[i][w - 1]
+    // заполняем таблицу
+    for (i in 0 until treasures.count()) {
+        for (j in 0..capacity) {
+            // проверяем, поместится ли предмет в рюкзак
+            // i - номер объекта
+            if (j - weightsList[i] >= 0) { // если оставшегося места хватит
+                memtable[i + 1][j] = maxOf( // выбираем большее из
+                    memtable[i + 1 - 1][j], // предыдущей комбинации и
+                    memtable[i + 1 - 1][j - weightsList[i]] + pricesList[i] // текущей
+                )
+            } else { // если предмет не влазит
+                memtable[i + 1][j] = memtable[i + 1 - 1][j] // оставляем значение ценности от предыдущего предмета
             }
         }
     }
 
-    // получение названий предметов
-    // идем по списку предметов в обратном порядке, вычитаем массу из вместимости, запоминаем порядковый номер
-    val resultList = mutableListOf<Int>()
-    var weightLeft = capacity - 1
-    for (i in treasures.count() - 1 downTo 1) {
-        // если в предыдущей строке в этом же столбце масса такая же, значит, объект не брали, переходим к следующему индексу
-        if (memtable[i][weightLeft] != memtable[i - 1][weightLeft]) {
-            weightLeft -= weightsList[i]
-            resultList.add(i - 1)
+    // восстановление индексов предметов
+    // начинаем с правого нижнего угла таблицы
+    var tmpCapacity = capacity
+    val objectsTaken = mutableListOf<Int>()
+
+    for (i in treasures.count() downTo 1) {
+        for (j in tmpCapacity downTo 1) {
+            if (memtable[i][j] == memtable[i - 1][j]) { // если у предыдущего предмета такая же ценность, значит текущий мы не брали
+                break // переходим к следующему предмету
+            }
+            objectsTaken.add(i - 1)
+            tmpCapacity -= weightsList[i - 1] // уменьшаем вместимость на массу взятого предмета
+            break // переходим к следующему предмету
         }
     }
+
     val result = mutableSetOf<String>()
-    resultList.forEach { result.add(treasures.toList().elementAt(it).toList()[0].toString()) }
-    // трансформируем список индексов в множество названий или в пустое множество
-    return if (resultList.isEmpty()) {
-        emptySet()
-    } else {
-        result
+    objectsTaken.forEach {
+        result.add(namesList[it])
     }
+    return result.toSet()
+}
+
+fun main() {
+    bagPacking(
+        mapOf(
+            "1" to (3 to 1),
+            "2" to (4 to 6),
+            "3" to (5 to 4),
+            "4" to (8 to 7),
+            "5" to (9 to 6)
+        ),
+        13
+    )
 }
