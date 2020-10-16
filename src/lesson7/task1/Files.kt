@@ -389,9 +389,46 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val rawInput = File(inputName).readLines()
+    val outputStream = File(outputName).bufferedWriter()
+    val inputLines = rawInput.filter { it.isNotEmpty() }.map { it.toLowerCase() }
+    val wordsToKeep = mutableListOf<Int>() // запомним индексы строк со словами без повторов букв
+
+    for (i in inputLines.indices) {
+        wordsToKeep.add(i)
+    }
+
+    inputLines.forEach { word ->
+        for (letter in word) {
+            if (word.filter { it == letter }.count() > 1) {
+                wordsToKeep.remove(inputLines.indexOf(word))
+                break
+            }
+        }
+    }
+
+    // оставим только слова без повторов из первичного списка, в котором сохранен регистр
+    val noRepeats = mutableListOf<String>()
+    wordsToKeep.forEach {
+        noRepeats.add(rawInput[it])
+    }
+
+    // выберем слова с максимальной длиной
+    val outputLines = noRepeats.filter { it.length == (noRepeats.maxBy { it.length })!!.length }
+
+    // запишем слова в файл через запятую
+    for (i in outputLines.indices) {
+        outputStream.write(outputLines[i])
+        if (i < outputLines.size - 1) {
+            outputStream.write(", ")
+        }
+    }
+    outputStream.close()
 }
 
+fun main() {
+    chooseLongestChaoticWord("input/chaotic_in2.txt", "temp.txt")
+}
 /**
  * Сложная
  *
